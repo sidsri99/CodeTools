@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset = "UTF-8" />
+		<meta name = "viewport"
+		      content = "width = device-width, initial-scale = 1.0" />
+		<title> CodeTools | QR Code Generator</title>
+		<style>
+		body, header{
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+		</style>
+		
+		<script src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
+		</script>
+	</head>
+	
+	<body>
+		<header>
+			<h1> CodeTools </h1>
+			<h2>QR Code Generator </h2>
+			<h3> Enter QR code content</h3>
+		</header>
+		<main>
+			<form action = "/"
+				  id = "qr-form">
+				<input type = "text"
+				       id   = "qr-content"
+					   value = ""
+					   placeholder = "Enter QR content"/>
+			    <input type  = "submit"
+					   value = "Generate QR code"/>
+			</form>
+			<br/>
+			<div id = "qr-code">
+		    </div>
+		</main>
+		<footer>
+			&copy 2024 | CodeTools
+		</footer>
+	</body>
+	<script>
+		let qrContent = document.getElementById("qr-content");
+		let qrForm = document.getElementById("qr-form");
+		let qrCode;
+		function generateQRCode(qrContent){
+			return new QRCode("qr-code", {
+				text: qrContent,
+				width: 256,
+				hight: 256,
+				colorDark: "#000000",
+				colorLight: "#ffffff",
+				correctLevel: QRCode.CorrectLevel.H,
+			});
+		}
+		qrForm.addEventListener("submit", function(event){
+		    event.preventDefault();
+			let qr = qrContent.value;
+			if(qrCode == null){
+				qrCode = generateQRCode(qr);
+			}
+			else{
+				qrCode.makeCode(qr);
+			}
+		});
+	</script>
+</html>
