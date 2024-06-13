@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset = "UTF-8" />
+		<meta name = "viewport"
+		      content = "width = device-width, initial-scale = 1.0" />
+		<title> CodeTools | Todo Planner</title>
+		<style>
+		body, header{
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+		</style>
+	</head>
+	<body>
+		<h1>Todo Planner</h1>
+		<div>
+			<label for="tag-filter">Filter by Tag: </label>
+			<select id = "tag-filter">
+				<option value = "">All</option>
+				<option value = "work">Work</option>
+				<option value = "skill">Skill</option>
+				<option value = "extra">Extra</option>
+			</select>
+		</div>
+		<div>
+			<label for="date-filter">Filter by Date: </label>
+			<input type="date" id="date-filter">
+		</div>
+		<div>
+			<label for="person-responsible-filter">Filter by owner: </label>
+			<select id = "person-responsible-filter">
+				<option value = "">All</option>
+				<option value = "Emp1">Emp1</option>
+				<option value = "Emp2">Emp2</option>
+				<option value = "Emp3">Emp3</option>
+			</select>
+		</div>
+		<div>
+			<input type="text" id="new-task" placeholder="Add new task">
+			<input type="date" id="new-task-date">
+			<select id = "new-task-tag">
+				<option value = "">Select Tag</option>
+				<option value = "work">Work</option>
+				<option value = "skill">Skill</option>
+				<option value = "extra">Extra</option>
+			</select>
+			<select id = "new-task-person-responsible">
+				<option value = "">Owner</option>
+				<option value = "Emp1">Emp1</option>
+				<option value = "Emp2">Emp2</option>
+				<option value = "Emp3">Emp3</option>
+			</select>
+			<button id="add-task">Add task</button>
+		</div>
+		<ul id="todo-list"></ul>
+		<footer>
+			&copy 2024 | CodeTools
+		</footer>
+		<script>
+		document.addEventListener('DOMContentLoaded', function() {
+            const todoList = document.getElementById('todo-list');
+            const tagFilter = document.getElementById('tag-filter');
+            const dateFilter = document.getElementById('date-filter');
+            const personResponsibleFilter = document.getElementById('person-responsible-filter');
+            const newTaskInput = document.getElementById('new-task');
+            const newTaskDateInput = document.getElementById('new-task-date');
+            const newTaskTagInput = document.getElementById('new-task-tag');
+            const newTaskPersonResponsibleInput = document.getElementById('new-task-person-responsible');
+            const addTaskBtn = document.getElementById('add-task');
+
+            let todos = JSON.parse(localStorage.getItem('todos')) || [];
+
+            // Function to render todos
+            function renderTodos() {
+                todoList.innerHTML = '';
+                const filteredTodos = todos.filter(todo => {
+                    const tagMatch = tagFilter.value === '' || todo.tags.includes(tagFilter.value);
+                    const dateMatch = dateFilter.value === '' || todo.date === dateFilter.value;
+                    const personResponsibleMatch = personResponsibleFilter.value === '' || todo.personResponsible === personResponsibleFilter.value;
+                    return tagMatch && dateMatch && personResponsibleMatch;
+                });
+
+                filteredTodos.forEach((todo, index) => {
+                    const li = document.createElement('li');
+                    li.textContent = todo.task + " - " + todo.date + " (" + todo.tags.join(', ') + ") Person Responsible: " + todo.personResponsible;
+                    li.classList.add('todo-item');
+
+                    // Add edit button
+                    const editBtn = document.createElement('button');
+                    editBtn.textContent = 'Edit';
+                    editBtn.addEventListener('click', () => {
+                        const newTask = prompt('Enter new task:', todo.task);
+                        if (newTask !== null) {
+                            todo.task = newTask;
+                            localStorage.setItem('todos', JSON.stringify(todos));
+                            renderTodos();
+                        }
+                    });
+
+                    // Add delete button
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = 'Delete';
+                    deleteBtn.addEventListener('click', () => {
+                        todos.splice(index, 1);
+                        localStorage.setItem('todos', JSON.stringify(todos));
+                        renderTodos();
+                    });
+
+                    li.appendChild(editBtn);
+                    li.appendChild(deleteBtn);
+                    todoList.appendChild(li);
+                });
+            }
+
+            // Initial render
+            renderTodos();
+
+            // Event listeners for filters
+            tagFilter.addEventListener('change', renderTodos);
+            dateFilter.addEventListener('change', renderTodos);
+            personResponsibleFilter.addEventListener('change', renderTodos);
+
+            // Event listener for adding new task
+            addTaskBtn.addEventListener('click', () => {
+                const newTask = newTaskInput.value.trim();
+                const newTaskDate = newTaskDateInput.value;
+                const newTaskTag = newTaskTagInput.value;
+                const newTaskPersonResponsible = newTaskPersonResponsibleInput.value;
+                if (newTask !== '' && newTaskDate !== '' && newTaskTag !== '' && newTaskPersonResponsible !== '') {
+                    const newTodo = {
+                        task: newTask,
+                        date: newTaskDate,
+                        tags: [newTaskTag],
+                        personResponsible: newTaskPersonResponsible
+                    };
+                    todos.push(newTodo);
+                    localStorage.setItem('todos', JSON.stringify(todos));
+                    newTaskInput.value = '';
+                    newTaskDateInput.value = '';
+                    newTaskTagInput.value = '';
+                    newTaskPersonResponsibleInput.value = '';
+                    renderTodos();
+                }
+            });
+        });
+		</script>
+	</body>
+</html>
